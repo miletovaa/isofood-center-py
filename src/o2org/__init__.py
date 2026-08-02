@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from .analysis import Dataset, quick_report
 from .client import OrgClient
 from .config import resolve_credentials
 from .exceptions import (
@@ -48,8 +47,6 @@ def connect(
 __all__ = [
     "connect",
     "OrgClient",
-    "Dataset",
-    "quick_report",
     "O2OrgError",
     "AuthenticationError",
     "APIError",

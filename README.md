@@ -1,19 +1,15 @@
 # o2org
 
-A Python toolkit for the o2_org_dma metabolomics database, for two kinds of work:
+A Python client for the o2_org_dma metabolomics database: log in with your
+email/password and pull any table (compounds, projects, samples,
+experiments, ...) into Python, or write records back.
 
-1. **Data retrieval** — log in with your email/password and pull any table
-   (compounds, projects, samples, experiments, ...) into Python for analysis or reporting.
-2. **Analysis shortcuts** — one-line normalization, statistics, machine
-   learning, visualization, and whole pipelines.
-
-No SQL, no `requests` calls, no boilerplate — just Python data and plots.
+No SQL, no `requests` calls, no boilerplate — just Python data.
 
 **New here?** [`examples/o2org_walkthrough.ipynb`](examples/o2org_walkthrough.ipynb)
-runs through everything below end to end — connecting, retrieving data, error
-handling, and the full analysis pipeline — against a small in-memory fake
-server (org_dma's real API isn't live yet), with every cell's output saved so
-you can read it without running anything. Open it with
+runs through everything below end to end — connecting, retrieving data, and
+error handling — against a real org_dma instance, with every cell's output
+saved so you can read it without running anything. Open it with
 `pip install -e ".[notebook]"` then `jupyter notebook examples/`.
 
 > **Status:** this library is a REST API client. It expects org_dma to expose
@@ -32,8 +28,7 @@ pip install -e .        # from a checkout of this repo
 
 (Once published, this will just be `pip install o2org`.)
 
-This pulls in `requests`, `pandas`, `numpy`, `scipy`, `scikit-learn`, and
-`matplotlib` — nothing else to install by hand.
+This pulls in `requests` and `pandas` — nothing else to install by hand.
 
 ## Connecting
 
@@ -125,10 +120,9 @@ rows across hundreds of pages — `acid` matches over 30,000 compounds in a
 78,000-row real table. `.count()`/`.pages` never walk those pages just to
 hand you a number; they read it straight from the server's pagination
 metadata in a single request. `.get()` (or iterating/indexing the result
-directly, or passing it straight into `Dataset`/`quick_report`/anything in
-`o2org.analysis`) is what actually fetches the records, and returns a
-`RecordList` — a plain list of dicts with `.count()` and `.names()` added, so
-once you have the records, counting/naming them doesn't need pandas either.
+directly) is what actually fetches the records, and returns a `RecordList` —
+a plain list of dicts with `.count()` and `.names()` added, so once you have
+the records, counting/naming them doesn't need pandas either.
 
 That fetch walks every page and returns every match by default when you filter
 — a filter is supposed to narrow things down, so "give me everything that
@@ -147,80 +141,11 @@ are unaffected either way, since they always report the query's true total:
 client.compounds.list(page=2)
 ```
 
-Feed the result straight into anything in `o2org.analysis` (see below) —
-still lazy or already fetched, either way there's no separate "convert to a
-DataFrame" step to remember.
-
 `project_compounds` and `experiment_records` are nested under their parent (a
 project, an experiment), so their `list()` takes a parent id:
 
 ```python
 client.project_compounds.list(project_id=5)
-```
-
-## Analysis shortcuts
-
-The whole point of this half of the library is that you never have to touch
-scikit-learn or matplotlib directly — or even pandas. Every function below
-accepts data in whatever shape you retrieved it: the still-lazy result of
-`client.compounds.list()` (fetched here, since "I want to analyze this" is
-unambiguous), a single dict from `client.compounds.get(42)`, a DataFrame, or a
-CSV you loaded yourself. Each one inspects what it was given and converts
-internally, so there's nothing to get wrong by picking the "df" version
-instead of the "dict" version — there's only one version.
-
-### The one-liner: `quick_report`
-
-```python
-from o2org.analysis import quick_report
-
-data = client.compounds.list()
-
-quick_report(data)                       # summary table + correlation heatmap + PCA plot
-quick_report(data, target="mz")          # ...plus a regression predicting mz
-quick_report(data, target="is_mapped")   # ...plus a classifier, if the target looks categorical
-```
-
-That's the entire pipeline: cleaning-aware summary, visualization, and a
-model, in one call.
-
-### Step by step: `Dataset`
-
-When you want to control the steps yourself, `Dataset` wraps retrieved data
-and chains cleanly:
-
-```python
-from o2org.analysis import Dataset
-
-ds = Dataset(client.compounds.list())
-ds.impute(method="mean")          # fill missing values
-ds.normalize(method="zscore")     # scale numeric columns (or "minmax", "robust")
-ds.summary()                      # per-column stats: dtype, missing, mean, std, ...
-ds.correlation()                  # correlation matrix + a heatmap
-ds.pca(n_components=2)            # PCA + a scatter plot of PC1 vs PC2
-ds.cluster(k=3)                   # k-means + a colored scatter plot
-ds.regression(target="mz")        # linear regression + predicted-vs-actual plot
-ds.classify(target="is_mapped")   # logistic regression (or model="random_forest")
-```
-
-Every step that cleans data (`impute`, `normalize`, `encode`) returns `ds`
-itself, so they chain: `Dataset(data).impute().normalize()`. Every step that
-*analyzes* data returns a result object instead — inspect it, or call
-`.plot()` again with different options:
-
-```python
-result = ds.pca(plot=False)
-result.explained_variance_ratio
-result.components               # DataFrame of PC1, PC2, ...
-result.plot(hue="sample_group")
-```
-
-Statistical tests are one call each, no `scipy` required:
-
-```python
-ds.ttest(group_col="sample_group", value_col="mz")
-ds.anova(group_col="sample_group", value_col="mz")
-ds.chi_square(col1="sample_type", col2="storage_condition")
 ```
 
 ## Other procedures: creating & updating records

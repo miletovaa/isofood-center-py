@@ -35,20 +35,18 @@ a ListQuery, and what happens next depends on what you do with it:
 request — they never walk every page just to hand you a number, which matters
 a lot on a filter that matches thousands of rows across a huge table.
 Anything that actually needs the records (`.get()`, iterating, indexing,
-`==`, `repr()`, or passing the query straight into `Dataset`/`o2org.analysis`)
-fetches and caches the full result the same way a materialized call always
-did — every page is walked and combined whenever that's safe to assume: a
-filtered search on a top-level resource (a filter narrows the result, so
-"give me every match" is the reasonable default) and any nested-resource list
-(already scoped to one parent). An unfiltered top-level list() only fetches
-the first page by default instead, since "give me the whole table" could mean
-tens of thousands of rows. Pass all_pages=True/False, or a specific page=N,
-to override either default explicitly.
+`==`, `repr()`) fetches and caches the full result the same way a
+materialized call always did — every page is walked and combined whenever
+that's safe to assume: a filtered search on a top-level resource (a filter
+narrows the result, so "give me every match" is the reasonable default) and
+any nested-resource list (already scoped to one parent). An unfiltered
+top-level list() only fetches the first page by default instead, since "give
+me the whole table" could mean tens of thousands of rows. Pass
+all_pages=True/False, or a specific page=N, to override either default
+explicitly.
 
 The fully-fetched result is a RecordList — a plain list of dicts with
-`.count()` and `.names()` added (e.g. client.compounds.list().get().names())
-— pass it (or the still-lazy query — it fetches on demand) straight to
-anything in o2org.analysis, which detects the shape and converts internally.
+`.count()` and `.names()` added (e.g. client.compounds.list().get().names()).
 
 A few entities (project compounds, experiment records) are nested under a
 parent for listing/creation but addressed directly by id for show/update

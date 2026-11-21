@@ -21,7 +21,7 @@ import requests
 from .exceptions import APIError, AuthenticationError, NotFoundError, ValidationError
 
 if TYPE_CHECKING:
-    from .resources import ExperimentRecords, ProjectCompounds, Resource
+    from .resources import ExperimentRecords, ProjectCompounds, Resource, Samples
 
 
 def _safe_json(response: requests.Response) -> Any | None:
@@ -53,11 +53,11 @@ class OrgClient:
     biomarkers: Resource
     compound_biomarkers: Resource
     taxonomies: Resource
-    samples: Resource
     samplings: Resource
     experiments: Resource
     project_compounds: ProjectCompounds
     experiment_records: ExperimentRecords
+    samples: Samples
 
     def __init__(
         self,
@@ -146,6 +146,22 @@ class OrgClient:
         """
         self._user = self._request("GET", "/api/me")
         return self._user
+
+    def record_type_schema(self, record_type: str) -> dict[str, Any]:
+        """Fetch the declarative EAV field schema for a record_type via
+        GET /api/record-types/{recordType}/schema.
+
+        This is what `o2org.pipelines.utils.extract.extract()` uses to
+        flatten `details` JSON without hardcoding a Python copy of the
+        server's `ExperimentRecord::fieldSchema()`.
+
+        Args:
+            record_type: e.g. "result_stable_isotopes".
+
+        Returns:
+            `{"record_type", "label", "family", "fields": [...]}`.
+        """
+        return self._request("GET", f"/api/record-types/{record_type}/schema")
 
     def _set_token(self, token: str) -> None:
         self._token = token

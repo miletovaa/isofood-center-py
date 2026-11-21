@@ -504,6 +504,82 @@ class ExperimentRecords(_NestedResource):
         """
         return super().bulk_create(experiment_id, records)
 
+    def list_by_project(
+        self, project_id: Any, record_type: str,
+        all_pages: bool | None = None, page: int | None = None, **params: Any,
+    ) -> ListQuery:
+        """List/search experiment records across an entire project, filtered
+        by `record_type` — the shared extraction call every pipeline in
+        `o2org.pipelines` is built on (see `o2org.pipelines.utils.extract`).
+        Lazy — see `_NestedResource.list`.
+
+        Each record comes back with its sample's `sample_group`/
+        `sample_subgroup`/`matrix_group`/`storage_condition`/`project_id`
+        already joined in server-side, so no second merge is needed.
+
+        Args:
+            project_id: The project's id.
+            record_type: One of `ExperimentRecord::RECORD_TYPES` on the
+                server (e.g. "result_stable_isotopes") — required by the
+                endpoint.
+            all_pages: Whether `.get()`/iterating walks every page. Defaults
+                to True (already project-scoped) unless `page` is given.
+            page: Which page `.get()`/iterating fetches.
+            **params: Additional query-string filters (e.g. `per_page`).
+        """
+        params = {**params, "record_type": record_type}
+        if all_pages is None:
+            all_pages = page is None
+
+        def fetch_page(requested_page: int | None) -> tuple[list[Record], Record | None]:
+            page_params = {**params, "page": requested_page} if requested_page is not None else params
+            return _unwrap_list(self.client.get(f"/api/projects/{project_id}/experiment-records", params=page_params))
+
+        query = ListQuery(fetch_page, all_pages)
+        if page is not None:
+            query._cheap = fetch_page(page)
+        return query
+
+
+class Samples(_NestedResource):
+    """`client.samples` — nested under a project for list/create, addressed
+    directly by id for get/update.
+    """
+
+    endpoint = "samples"          # used for get/update
+    parent_endpoint = "projects"
+    nested_path_name = "samples"
+
+    def list(self, project_id: Any, all_pages: bool | None = None, page: int | None = None, **params: Any) -> ListQuery:
+        """List/search the samples attached to one project. Lazy — see
+        `_NestedResource.list`.
+
+        Args:
+            project_id: The project's id.
+            all_pages: Whether `.get()`/iterating walks every page. Defaults to True unless `page` is given.
+            page: Which page `.get()`/iterating fetches.
+            **params: Arbitrary query-string filters (e.g. `sample_group="food"`).
+        """
+        return super().list(project_id, all_pages=all_pages, page=page, **params)
+
+    def create(self, project_id: Any, **fields: Any) -> Record:
+        """Add a new sample to a project.
+
+        Args:
+            project_id: The project's id.
+            **fields: Field values for the new record, e.g. `sample_group="food"`.
+        """
+        return super().create(project_id, **fields)
+
+    def bulk_create(self, project_id: Any, records: _List[Record] | pd.DataFrame) -> dict[str, Any]:
+        """Add many samples to a project, one request per row.
+
+        Args:
+            project_id: The project's id.
+            records: A list of dicts, or a DataFrame (one row per record).
+        """
+        return super().bulk_create(project_id, records)
+
 
 # endpoint (URL segment) for every remaining entity in the current schema
 _SIMPLE_RESOURCES = {
@@ -519,7 +595,6 @@ _SIMPLE_RESOURCES = {
     "biomarkers": "biomarkers",
     "compound_biomarkers": "compound-biomarkers",
     "taxonomies": "taxonomies",
-    "samples": "samples",
     "samplings": "samplings",
     "experiments": "experiments",
 }
@@ -533,3 +608,4 @@ def attach_resources(client: OrgClient) -> None:
         setattr(client, attr, Resource(client, endpoint))
     client.project_compounds = ProjectCompounds(client)
     client.experiment_records = ExperimentRecords(client)
+    client.samples = Samples(client)

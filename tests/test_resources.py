@@ -104,6 +104,42 @@ def test_nested_experiment_records_list_uses_parent_path():
     assert url == "https://dma.example.org/api/experiments/3/records"
 
 
+def test_nested_samples_list_uses_parent_path():
+    client = _authed_client()
+    with patch("requests.Session.request", return_value=FakeResponse(200, [])) as mock_request:
+        client.samples.list(project_id=12).get()
+    _, url = mock_request.call_args.args[:2]
+    assert url == "https://dma.example.org/api/projects/12/samples"
+
+
+def test_samples_update_uses_shallow_path():
+    client = _authed_client()
+    with patch("requests.Session.request", return_value=FakeResponse(200, {"id": 6})) as mock_request:
+        client.samples.update(6, sample_group="food")
+    method, url = mock_request.call_args.args[:2]
+    assert method == "PUT"
+    assert url == "https://dma.example.org/api/samples/6"
+
+
+def test_experiment_records_list_by_project_hits_project_scoped_endpoint():
+    client = _authed_client()
+    with patch("requests.Session.request", return_value=FakeResponse(200, [])) as mock_request:
+        client.experiment_records.list_by_project(12, record_type="result_stable_isotopes").get()
+    _, url = mock_request.call_args.args[:2]
+    _, kwargs = mock_request.call_args
+    assert url == "https://dma.example.org/api/projects/12/experiment-records"
+    assert kwargs["params"] == {"record_type": "result_stable_isotopes"}
+
+
+def test_experiment_records_list_by_project_defaults_to_all_pages():
+    client = _authed_client()
+    page1 = FakeResponse(200, {"data": [{"id": 1}], "meta": {"current_page": 1, "last_page": 2}})
+    page2 = FakeResponse(200, {"data": [{"id": 2}], "meta": {"current_page": 2, "last_page": 2}})
+    with patch("requests.Session.request", side_effect=[page1, page2]):
+        items = client.experiment_records.list_by_project(12, record_type="result_stable_isotopes").get()
+    assert items.count() == 2
+
+
 def test_nested_project_compounds_update_uses_shallow_path():
     client = _authed_client()
     with patch("requests.Session.request", return_value=FakeResponse(200, {"id": 42})) as mock_request:

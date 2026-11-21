@@ -72,6 +72,17 @@ def test_logout_clears_token():
     assert "Authorization" not in client.session.headers
 
 
+def test_record_type_schema_hits_schema_endpoint():
+    client = OrgClient("https://dma.example.org", token="preset-token")
+    payload = {"record_type": "result_stable_isotopes", "label": "Result — stable isotopes", "family": "result", "fields": []}
+    with patch("requests.Session.request", return_value=FakeResponse(200, payload)) as mock_request:
+        schema = client.record_type_schema("result_stable_isotopes")
+    method, url = mock_request.call_args.args[:2]
+    assert method == "GET"
+    assert url == "https://dma.example.org/api/record-types/result_stable_isotopes/schema"
+    assert schema == payload
+
+
 def test_context_manager_logs_out():
     with patch("requests.Session.request", return_value=FakeResponse(204)):
         with OrgClient("https://dma.example.org", token="preset-token") as client:

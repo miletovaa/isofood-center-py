@@ -1,12 +1,2 @@
-import matplotlib
-import pytest
-
-matplotlib.use("Agg")  # headless: tests must never pop up a window
-
-import matplotlib.pyplot as plt
-
-
-@pytest.fixture(autouse=True)
-def _close_figures():
-    yield
-    plt.close("all")
+# Plotly figures (used throughout o2org.pipelines.viz) never open a window
+# or need a headless backend, so there's nothing to configure here.

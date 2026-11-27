@@ -37,7 +37,7 @@ of these:
   repo with no further setup.
 - **Personal access token:** on GitHub open *Settings → Developer settings →
   Personal access tokens → Fine-grained tokens*, create a token with access
-  to `miletovaa/isofood-center` and the permission *Contents: Read-only*. The
+  to `miletovaa/isofood-center-py` and the permission *Contents: Read-only*. The
   first time `pip` asks for a username and password, enter your GitHub
   username and paste the token as the password. Your system keychain
   remembers it.
@@ -48,21 +48,21 @@ of these:
 
 ```bash
 # the client only
-pip install "git+https://github.com/miletovaa/isofood-center.git"
+pip install "git+https://github.com/miletovaa/isofood-center-py.git"
 
 # with the statistics/ML pipelines (numpy, scipy, scikit-learn, statsmodels, plotly)
-pip install "isofood-center[pipelines] @ git+https://github.com/miletovaa/isofood-center.git"
+pip install "isofood-center[pipelines] @ git+https://github.com/miletovaa/isofood-center-py.git"
 
 # same over SSH
-pip install "isofood-center[pipelines] @ git+ssh://git@github.com/miletovaa/isofood-center.git"
+pip install "isofood-center[pipelines] @ git+ssh://git@github.com/miletovaa/isofood-center-py.git"
 ```
 
 To make an analysis reproducible, pin a released version (a git tag) or a
 commit by adding `@<tag>` to the URL, e.g.
-`...isofood-center.git@v0.1.0`. To update to the newest version:
+`...isofood-center-py.git@v0.1.0`. To update to the newest version:
 
 ```bash
-pip install --upgrade --force-reinstall --no-deps "git+https://github.com/miletovaa/isofood-center.git"
+pip install --upgrade --force-reinstall --no-deps "git+https://github.com/miletovaa/isofood-center-py.git"
 ```
 
 > ⚠️ Never put a token inside the URL in a script, notebook or
@@ -89,7 +89,7 @@ dependencies:
   - plotly
   - pip
   - pip:
-      - "isofood-center[pipelines] @ git+https://github.com/miletovaa/isofood-center.git"
+      - "isofood-center[pipelines] @ git+https://github.com/miletovaa/isofood-center-py.git"
 ```
 
 then:
@@ -105,8 +105,8 @@ The heavy scientific packages come from conda-forge, and pip only adds
 ### From a local checkout (for development)
 
 ```bash
-git clone https://github.com/miletovaa/isofood-center.git
-cd isofood-center
+git clone https://github.com/miletovaa/isofood-center-py.git
+cd isofood-center-py
 pip install -e ".[dev,pipelines]"
 ```
 

@@ -1,4 +1,4 @@
-"""Shared extraction & pivot layer, used by every pipeline in `o2org.pipelines`.
+"""Shared extraction & pivot layer, used by every pipeline in `isofood_center.pipelines`.
 
 org_dma's analysis data starts as EAV rows in `experiment_records.details`
 (JSON), not a CSV/Excel file. Every pipeline needs the same first step before

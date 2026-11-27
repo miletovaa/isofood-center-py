@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from o2org.pipelines import ml, viz
+from isofood_center.pipelines import ml, viz
 
 
 @pytest.fixture
@@ -88,7 +88,7 @@ def test_pls_regression_predicts_continuous_target():
 
 
 def test_new_figures_build(three_class_df):
-    from o2org.pipelines import stats
+    from isofood_center.pipelines import stats
 
     res = ml.classify(three_class_df, FEATURES, "label", model="lda")
     r, p = stats.correlation_matrix(three_class_df, FEATURES)

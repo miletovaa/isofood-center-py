@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from o2org.pipelines import stats
+from isofood_center.pipelines import stats
 
 
 def _grouped_df():

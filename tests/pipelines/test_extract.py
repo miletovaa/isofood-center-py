@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
-from o2org.client import OrgClient
-from o2org.pipelines.utils.extract import extract, flatten_details, pivot_wide, resolve_compound_names
+from isofood_center.client import OrgClient
+from isofood_center.pipelines.utils.extract import extract, flatten_details, pivot_wide, resolve_compound_names
 
 from ..helpers import FakeResponse
 

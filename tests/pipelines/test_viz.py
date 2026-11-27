@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import pytest
 
-from o2org.pipelines import ml, viz
+from isofood_center.pipelines import ml, viz
 
 
 @pytest.fixture
@@ -109,7 +109,7 @@ def test_van_krevelen_plot_uses_o_c_and_h_c_axes(grouped_df):
 
 def test_save_figure_writes_both_png_and_html(tmp_path):
     pytest.importorskip("kaleido")
-    from o2org.pipelines.utils import save_figure
+    from isofood_center.pipelines.utils import save_figure
 
     fig = go.Figure(go.Scatter(x=[1, 2], y=[3, 4]))
     stem = save_figure(fig, tmp_path / "myplot")

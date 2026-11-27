@@ -7,4 +7,4 @@ build/
 *.egg-info/
 .pytest_cache/
 .env
-.o2org/
+.isofood_center/

@@ -510,7 +510,7 @@ class ExperimentRecords(_NestedResource):
     ) -> ListQuery:
         """List/search experiment records across an entire project, filtered
         by `record_type` — the shared extraction call every pipeline in
-        `o2org.pipelines` is built on (see `o2org.pipelines.utils.extract`).
+        `isofood_center.pipelines` is built on (see `isofood_center.pipelines.utils.extract`).
         Lazy — see `_NestedResource.list`.
 
         Each record comes back with its sample's `sample_group`/

@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from o2org.client import OrgClient
+from isofood_center.client import OrgClient
 
 from .helpers import FakeResponse
 

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from o2org.pipelines import preprocessing
+from isofood_center.pipelines import preprocessing
 
 
 def test_log10_transform_clips_at_pseudocount():

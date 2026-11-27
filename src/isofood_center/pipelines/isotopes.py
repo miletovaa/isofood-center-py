@@ -49,7 +49,7 @@ def stats_pipeline(
         client: A connected `OrgClient`.
         project_id: The project's id.
         grouping: Which sample attribute to compare groups on — see
-            `o2org.pipelines.utils.GROUPING_CANDIDATES`.
+            `isofood_center.pipelines.utils.GROUPING_CANDIDATES`.
         alpha: Significance threshold for normality and group-difference tests.
         correction: Multiple-testing correction across analytes.
         grubbs_alpha: Significance level for outlier flagging (isotope values

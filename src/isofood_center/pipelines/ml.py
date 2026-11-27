@@ -265,7 +265,7 @@ def lda_classify(df: pd.DataFrame, feature_cols: list[str], label_col: str) -> L
 
     score_cols = [f"LD{i + 1}" for i in range(scores.shape[1])]
     scores_df = pd.DataFrame(scores, columns=score_cols, index=df.index)
-    scores_df[label_col] = df[label_col].values
+    scores_df[label_col] = df[label_col].to_numpy()
     return LDAResult(model=model, scores=scores_df, y_true=y, y_pred=y_pred, encoder=encoder)
 
 
@@ -416,8 +416,10 @@ def _xy(df: pd.DataFrame, feature_cols: list[str], label_col: str, groups_col: s
     sub = df.dropna(subset=[label_col])
     X = sub[feature_cols].apply(pd.to_numeric, errors="coerce")
     X = X.fillna(X.median())  # cheap, leak-free-enough default; impute properly upstream
-    groups = sub[groups_col].astype(str).values if groups_col else None
-    return X, sub[label_col].astype(str).values, groups
+    # to_numpy(dtype=str), not .values: pandas 3 (e.g. the Pyodide/browser
+    # build) returns Arrow-backed string arrays that sklearn can't index
+    groups = sub[groups_col].astype(str).to_numpy(dtype=str) if groups_col else None
+    return X, sub[label_col].astype(str).to_numpy(dtype=str), groups
 
 
 def _cv(y, n_splits: int, seed: int, groups=None):
@@ -566,7 +568,7 @@ def permutation_test(
         # (sklearn's permutation_test_score shuffles *within* groups, which
         # leaves one-label-per-sample data unchanged)
         g_label = pd.Series(y, index=groups).groupby(level=0).first()
-        shuffles = (pd.Series(rng.permutation(g_label.values), index=g_label.index).loc[groups].values
+        shuffles = (pd.Series(rng.permutation(g_label.to_numpy(dtype=str)), index=g_label.index).loc[groups].to_numpy(dtype=str)
                     for _ in range(n_permutations))
     real = score(y)
     perm = np.array([score(lab) for lab in shuffles])

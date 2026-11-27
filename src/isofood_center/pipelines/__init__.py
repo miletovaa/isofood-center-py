@@ -6,10 +6,10 @@ The building blocks they're composed from — extraction/pivoting, individual
 statistical tests, ML techniques, and plots — are in `utils`, `stats`, `ml`,
 and `viz` respectively, and are meant to be called directly too.
 
-    import o2org
-    from o2org.pipelines import isotopes
+    import isofood_center
+    from isofood_center.pipelines import isotopes
 
-    client = o2org.connect()
+    client = isofood_center.connect()
     result = isotopes.stats_pipeline(client, project_id=42)
     result["figures"]["box"].show()
 """

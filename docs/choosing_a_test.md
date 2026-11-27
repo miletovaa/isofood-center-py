@@ -22,7 +22,7 @@ A decision guide for picking a statistical test for your data. You answer a shor
 Start at [Question 1](#question-1--is-the-result-a-number-or-a-category) and
 follow the YES/NO links until you reach a **🎯 Result**. That card in
 [section 4](#4-result-cards) names the test, says what question it answers,
-and says whether `o2org` supports it yet.
+and says whether `isofood_center` supports it yet.
 
 The questions are about **how the experiment was designed**: what was
 compared, and whether the same samples were measured more than once. They
@@ -57,7 +57,7 @@ Most of the tests in this guide come in **pairs**:
 > distribution of values.
 
 The decision tree picks the **pair**. With the default `test="auto"`,
-`o2org` then picks the test within the pair:
+`isofood_center` then picks the test within the pair:
 
 ```
 for each feature:
@@ -229,7 +229,7 @@ The groups can be any categories: regions, producers, matrices, years.
   - **You want to classify samples or find patterns** across the whole
     profile (for example, "can we tell a sample's origin from its VOC
     fingerprint?"). That is a multivariate question, not a single test. See
-    the PCA / Random Forest / LDA tools in `o2org.pipelines.ml`.
+    the PCA / Random Forest / LDA tools in `isofood_center.pipelines.ml`.
 
 > 🖼️ **SCHEMA PLACEHOLDER — S5: Relationship branch (Question 7)**
 >
@@ -243,7 +243,7 @@ Each card shows a test pair. Unless you force a specific test, the
 [automatic switch](#2-normality-and-the-automatic-switch) picks which one
 is run.
 
-Status: ✅ available in `o2org` (every card below is also in the UI: `o2org-ui`)
+Status: ✅ available in `isofood_center`
 
 ---
 
@@ -282,7 +282,7 @@ stats.effect_size(df_wide, "d15n", "origin")           # Cohen's d and fold chan
 mountains?
 
 ```python
-from o2org.pipelines import stats
+from isofood_center.pipelines import stats
 
 stats.test_all_features(df_wide, ["fe", "zn"], "sample_group")
 ```
@@ -433,7 +433,7 @@ honey?
 ## 5. Testing many compounds at once
 
 A typical dataset has many features: dozens of elements, or hundreds of VOCs.
-Every test has an α chance of a false positive (`o2org` uses α = 0.01 by
+Every test has an α chance of a false positive (`isofood_center` uses α = 0.01 by
 default). If you run 100 tests at α = 0.01 and none of the compounds truly
 differs, you should still expect about one "significant" result by chance
 alone.
@@ -442,7 +442,7 @@ alone.
 features. To decide what is significant, use `pvalue_corrected` (and the
 `significant` column, which is based on it), not the raw `pvalue`.
 
-| Correction | What it controls | When to use | In `o2org` |
+| Correction | What it controls | When to use | In `isofood_center` |
 |---|---|---|---|
 | Benjamini-Hochberg (FDR) | The expected *fraction* of false positives among the hits | Screening many compounds for candidates | ✅ default (`correction="fdr_bh"`) |
 | Bonferroni | The chance of *any* false positive at all | Few features, or when one false positive is costly | `correction="bonferroni"` |

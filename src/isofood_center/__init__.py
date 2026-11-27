@@ -8,7 +8,7 @@ from .exceptions import (
     APIError,
     AuthenticationError,
     NotFoundError,
-    O2OrgError,
+    IsofoodCenterError,
     ValidationError,
 )
 
@@ -24,7 +24,7 @@ def connect(
     """The main entry point: connect(base_url, email, password) -> OrgClient.
 
     Any argument left out is resolved from environment variables
-    (O2ORG_BASE_URL / O2ORG_EMAIL / O2ORG_PASSWORD) or ~/.o2org/config.ini
+    (ISOFOOD_CENTER_BASE_URL / ISOFOOD_CENTER_EMAIL / ISOFOOD_CENTER_PASSWORD) or ~/.isofood_center/config.ini
     (see config.py). Pass `token` instead of email/password to skip login and
     reuse an existing bearer token.
 
@@ -47,7 +47,7 @@ def connect(
 __all__ = [
     "connect",
     "OrgClient",
-    "O2OrgError",
+    "IsofoodCenterError",
     "AuthenticationError",
     "APIError",
     "NotFoundError",

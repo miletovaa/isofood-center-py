@@ -250,7 +250,7 @@ def dunn_test(
 
     sub = df[[value_col, group_col]].dropna()
     values = sub[value_col].astype(float).values
-    labels = sub[group_col].astype(str).values
+    labels = sub[group_col].astype(str).to_numpy(dtype=str)
     ranks = rankdata(values)
     n = len(values)
     _, tie_counts = np.unique(values, return_counts=True)

@@ -1,4 +1,4 @@
-"""Credential resolution: explicit args > environment variables > ~/.o2org/config.ini.
+"""Credential resolution: explicit args > environment variables > ~/.isofood_center/config.ini.
 
 Keeping this separate from client.py means adding more instances later (e.g. a
 [staging] profile alongside [default]) is a config-file change, not a code change.
@@ -10,11 +10,11 @@ import configparser
 import os
 from pathlib import Path
 
-DEFAULT_CONFIG_PATH = Path.home() / ".o2org" / "config.ini"
+DEFAULT_CONFIG_PATH = Path.home() / ".isofood_center" / "config.ini"
 
-ENV_BASE_URL = "O2ORG_BASE_URL"
-ENV_EMAIL = "O2ORG_EMAIL"
-ENV_PASSWORD = "O2ORG_PASSWORD"
+ENV_BASE_URL = "ISOFOOD_CENTER_BASE_URL"
+ENV_EMAIL = "ISOFOOD_CENTER_EMAIL"
+ENV_PASSWORD = "ISOFOOD_CENTER_PASSWORD"
 
 
 def _read_config_file(path: Path) -> configparser.ConfigParser | None:
@@ -42,7 +42,7 @@ def resolve_credentials(
         base_url: Explicit base URL, if the caller already has one.
         email: Explicit login email, if the caller already has one.
         password: Explicit login password, if the caller already has one.
-        profile: Section name to read from `config_path` (`~/.o2org/config.ini`
+        profile: Section name to read from `config_path` (`~/.isofood_center/config.ini`
             by default) when a value wasn't otherwise provided.
         config_path: Path to the config file. Overridable mainly for testing.
 

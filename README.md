@@ -1,12 +1,10 @@
-# o2org
+# isofood-center
 
-A Python client for the o2_org_dma metabolomics database: log in with your
+A Python client for the ISO-Food Center database: log in with your
 email/password and pull any table (compounds, projects, samples,
 experiments, ...) into Python, or write records back.
 
-No SQL, no `requests` calls, no boilerplate — just Python data.
-
-**New here?** [`examples/o2org_walkthrough.ipynb`](examples/o2org_walkthrough.ipynb)
+[`examples/isofood_center_walkthrough.ipynb`](examples/isofood_center_walkthrough.ipynb)
 runs through everything below end to end — connecting, retrieving data, and
 error handling — against a real org_dma instance, with every cell's output
 saved so you can read it without running anything. Open it with
@@ -21,22 +19,106 @@ saved so you can read it without running anything. Open it with
 
 ## Installation
 
-Requires Python 3.9+.
+Requires Python 3.9+. The package is installed as `isofood-center` and
+imported as `isofood_center` (Python names can't contain hyphens). It
+lives in a **private** GitHub repository,
+so installing it needs a GitHub account that has been given access.
+Ask the repository owner to add you as a collaborator, and accept the
+invitation sent to your GitHub email.
+
+### 1. Let your computer log in to GitHub (once)
+
+GitHub doesn't accept your account password for `git`/`pip`, so pick one
+of these:
+
+- **GitHub CLI (easiest):** install [`gh`](https://cli.github.com), run
+  `gh auth login`, choose *GitHub.com → HTTPS → Yes (authenticate Git)*,
+  and log in through the browser. After that `pip` can reach the private
+  repo with no further setup.
+- **Personal access token:** on GitHub open *Settings → Developer settings →
+  Personal access tokens → Fine-grained tokens*, create a token with access
+  to `miletovaa/isofood-center` and the permission *Contents: Read-only*. The
+  first time `pip` asks for a username and password, enter your GitHub
+  username and paste the token as the password. Your system keychain
+  remembers it.
+- **SSH key:** if you already push to GitHub over SSH, use the `git+ssh://`
+  URLs below instead.
+
+### 2. Install with pip
 
 ```bash
-pip install -e .        # from a checkout of this repo
+# the client only
+pip install "git+https://github.com/miletovaa/isofood-center.git"
+
+# with the statistics/ML pipelines (numpy, scipy, scikit-learn, statsmodels, plotly)
+pip install "isofood-center[pipelines] @ git+https://github.com/miletovaa/isofood-center.git"
+
+# same over SSH
+pip install "isofood-center[pipelines] @ git+ssh://git@github.com/miletovaa/isofood-center.git"
 ```
 
-(Once published, this will just be `pip install o2org`.)
+To make an analysis reproducible, pin a released version (a git tag) or a
+commit by adding `@<tag>` to the URL, e.g.
+`...isofood-center.git@v0.1.0`. To update to the newest version:
 
-This pulls in `requests` and `pandas` — nothing else to install by hand.
+```bash
+pip install --upgrade --force-reinstall --no-deps "git+https://github.com/miletovaa/isofood-center.git"
+```
+
+> ⚠️ Never put a token inside the URL in a script, notebook or
+> `requirements.txt` you share (`https://<token>@github.com/...`). Anyone who
+> sees the file can then use your GitHub account. Let `gh` or the keychain
+> handle the login instead.
+
+### Installing with conda
+
+`isofood_center` is installed with pip inside a conda environment; there is no
+separate conda package. Save this as `environment.yml`:
+
+```yaml
+name: isofood_center
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - statsmodels
+  - plotly
+  - pip
+  - pip:
+      - "isofood-center[pipelines] @ git+https://github.com/miletovaa/isofood-center.git"
+```
+
+then:
+
+```bash
+conda env create -f environment.yml
+conda activate isofood_center
+```
+
+The heavy scientific packages come from conda-forge, and pip only adds
+`isofood_center` itself. The GitHub login from step 1 is needed here too.
+
+### From a local checkout (for development)
+
+```bash
+git clone https://github.com/miletovaa/isofood-center.git
+cd isofood-center
+pip install -e ".[dev,pipelines]"
+```
+
+The base install pulls in `requests` and `pandas`. The `[pipelines]`
+extra adds the scientific stack needed by `isofood_center.pipelines`.
 
 ## Connecting
 
 Use a config file, so you never type a password in a script:
 
 ```ini
-# ~/.o2org/config.ini
+# ~/.isofood_center/config.ini
 [default]
 base_url = https://your-o2-org-dma-instance.example
 email = you@example.com
@@ -45,17 +127,17 @@ password = your-password
 
 
 ```python
-import o2org
+import isofood_center
 
-client = o2org.connect()
+client = isofood_center.connect()
 ```
 
 or pass the parameters directly in your script:
 
 ```python
-import o2org
+import isofood_center
 
-client = o2org.connect(
+client = isofood_center.connect(
     base_url="https://your-o2-org-dma-instance.example",
     email="you@example.com",
     password="your-password",
@@ -65,7 +147,7 @@ client = o2org.connect(
 <!-- Use it as a context manager to log out automatically when you're done:
 
 ```python
-with o2org.connect() as client:
+with isofood_center.connect() as client:
     compounds = client.compounds.list()
 ``` -->
 
@@ -191,7 +273,7 @@ deleting records.
 
 ## Pipelines
 
-`o2org.pipelines` adds domain-specific statistical/ML pipelines on top of the
+`isofood_center.pipelines` adds domain-specific statistical/ML pipelines on top of the
 REST client — one pair of `stats_pipeline()`/`ml_pipeline()` functions per
 result family (stable isotopes, elemental composition, MK GC-MS/IRMS, VOC
 GC-MS/IRMS), plus every underlying transform/test/plot as a standalone
@@ -206,7 +288,7 @@ project out of `experiment_records.details` (EAV JSON) and pivoting it from
 long (one row per analyte/compound) to wide (one row per sample):
 
 ```python
-from o2org.pipelines.utils import extract, pivot_wide
+from isofood_center.pipelines.utils import extract, pivot_wide
 
 df_long = extract(client, "result_stable_isotopes", project_id=42)
 df_wide = pivot_wide(df_long, index_cols=["sample_id", "sample_group"], analyte_col="details_analyte")
@@ -217,7 +299,7 @@ report: sample counts, per-analyte p-values and verdicts, and every figure,
 all rendered inline as the last expression in a Jupyter cell:
 
 ```python
-from o2org.pipelines import isotopes
+from isofood_center.pipelines import isotopes
 
 isotopes.stats_pipeline(client, project_id=42, grouping="sample_group")
 ```
@@ -244,13 +326,13 @@ and test results are unaffected) — faster for headless/batch use.
 
 `grouping` (which sample attribute defines the groups being compared) accepts
 any real column but is typically one of `sample_group`, `sample_subgroup`,
-`matrix_group`, or `project_id` — see `o2org.pipelines.utils.GROUPING_CANDIDATES`.
+`matrix_group`, or `project_id` — see `isofood_center.pipelines.utils.GROUPING_CANDIDATES`.
 
 The individual building blocks are plain functions, meant to be called
 directly if a pipeline's defaults don't fit:
 
 ```python
-from o2org.pipelines import stats, ml, viz, preprocessing
+from isofood_center.pipelines import stats, ml, viz, preprocessing
 
 stats.shapiro_by_group(df_wide, "d13c", "sample_group")
 stats.kruskal_wallis(df_wide, "d13c", "sample_group")
@@ -267,7 +349,7 @@ it from `extract()`/`pivot_wide()` or built it yourself.
 ### Normality & group comparison (`stats`)
 
 ```python
-from o2org.pipelines import stats
+from isofood_center.pipelines import stats
 
 stats.descriptive_stats(df_wide, "d13c", "sample_group")   # mean/median/std/n per group
 stats.shapiro_by_group(df_wide, "d13c", "sample_group")     # Shapiro-Wilk normality, one row per group
@@ -290,7 +372,7 @@ stats.test_all_features(df_wide, ["d13c", "d15n"], "sample_group", correction="f
 ### Preprocessing & normalization (`preprocessing`)
 
 ```python
-from o2org.pipelines import preprocessing
+from isofood_center.pipelines import preprocessing
 
 preprocessing.log10_transform(df_wide, ["d13c", "d15n"])
 preprocessing.pareto_scale(df_wide, ["d13c", "d15n"])                       # mean-center ÷ √std, the standard pre-PCA scaling
@@ -305,7 +387,7 @@ outlier_mask = preprocessing.grubbs_outliers(df_wide["d13c"].values)        # it
 ### Dimensionality reduction, classification & clustering (`ml`)
 
 ```python
-from o2org.pipelines import ml
+from isofood_center.pipelines import ml
 
 pca_result = ml.pca(df_wide, columns=["d13c", "d15n"])       # .scores, .loadings, .explained_variance_ratio
 ml.hotellings_t2_outliers(pca_result.scores)                  # outlier flags on the PC1/PC2 plane
@@ -329,11 +411,11 @@ ml.lda_classify(df_wide, ["d13c", "d15n"], "sample_group")     # lighter-weight 
 ### Visualization (`viz`)
 
 Every function returns a Plotly `go.Figure` (hover tooltips included) — call
-`.show()` in a notebook, or save with `o2org.pipelines.utils.save_figure(fig, "path/to/name")`
+`.show()` in a notebook, or save with `isofood_center.pipelines.utils.save_figure(fig, "path/to/name")`
 (writes both a `.png` and an interactive `.html`).
 
 ```python
-from o2org.pipelines import viz
+from isofood_center.pipelines import viz
 
 viz.box_plot(df_wide, ["d13c", "d15n"], "sample_group")
 viz.median_bar_plot(df_wide, ["d13c", "d15n"], "sample_group")
@@ -366,7 +448,7 @@ t-tests). Which test fits which experimental design is explained in
 [`docs/choosing_a_test.md`](docs/choosing_a_test.md).
 
 ```python
-from o2org.pipelines import stats, ml, viz
+from isofood_center.pipelines import stats, ml, viz
 
 # group comparisons — two groups → Welch / Mann-Whitney, 3+ → ANOVA / Kruskal-Wallis
 stats.test_all_features(df_wide, features, "sample_group")
@@ -411,29 +493,10 @@ New plots: `viz.correlation_heatmap`, `viz.regression_plot`,
 `viz.importance_bar` (VIP/permutation importance),
 `viz.model_comparison_plot`, `viz.permutation_hist`.
 
-## User interface
-
-For point-and-click analysis there's a Streamlit app on top of the same
-functions:
-
-```bash
-pip install -e ".[ui]"
-o2org-ui            # or: python -m o2org.ui
-```
-
-Load a CSV/Excel file, a project straight from org_dma, or the bundled
-synthetic example dataset; pick the grouping column and features; then work
-through the tabs — data overview, group comparisons (independent, two-factor,
-paired/repeated), correlation & regression, PCA & clustering, classification
-(model comparison, confusion matrix, VIP, permutation test), categorical
-tests, and the "which test?" guide. Every tab has a **Python code** expander
-showing the equivalent library calls, so an analysis started in the UI can
-be continued in a notebook.
-
 ## Handling errors
 
 ```python
-from o2org import AuthenticationError, NotFoundError, ValidationError, APIError
+from isofood_center import AuthenticationError, NotFoundError, ValidationError, APIError
 
 try:
     client.compounds.create(canonical_name="")
@@ -470,7 +533,7 @@ sit behind `auth:sanctum` middleware. `project-compounds`, `samples`, and
 show/update routes. This client has no delete operation, so a `destroy` route
 isn't required.
 
-`o2org.pipelines` needs two more routes beyond the standard CRUD shape above:
+`isofood_center.pipelines` needs two more routes beyond the standard CRUD shape above:
 
 | Purpose | Method & path | Notes |
 |---|---|---|
@@ -480,6 +543,6 @@ isn't required.
 ## Development
 
 ```bash
-pip install -e ".[dev,pipelines,ui]"
+pip install -e ".[dev,pipelines]"
 pytest
 ```

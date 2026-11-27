@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from o2org.pipelines import ml
+from isofood_center.pipelines import ml
 
 
 def _classification_df(n_per_class=15, seed=0):

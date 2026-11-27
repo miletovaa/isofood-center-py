@@ -3,15 +3,15 @@ from __future__ import annotations
 from typing import Any
 
 
-class O2OrgError(Exception):
+class IsofoodCenterError(Exception):
     """Base class for every error raised by this library."""
 
 
-class AuthenticationError(O2OrgError):
+class AuthenticationError(IsofoodCenterError):
     """Login failed, or a request was made without a valid session token."""
 
 
-class APIError(O2OrgError):
+class APIError(IsofoodCenterError):
     """The server returned an error response.
 
     Attributes:

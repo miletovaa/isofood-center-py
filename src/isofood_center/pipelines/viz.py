@@ -1,6 +1,6 @@
 """Visualizations — Plotly throughout (not matplotlib), so every figure gets
 hover tooltips and the same dual PNG+HTML export via
-`o2org.pipelines.utils.output.save_figure`. Structure and statistics are
+`isofood_center.pipelines.utils.output.save_figure`. Structure and statistics are
 ported directly from the reference lcms/peptide pipelines; the matplotlib
 plotting calls there are transliterated to Plotly equivalents.
 """

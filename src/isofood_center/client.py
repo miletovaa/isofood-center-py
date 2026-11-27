@@ -34,7 +34,7 @@ def _safe_json(response: requests.Response) -> Any | None:
 class OrgClient:
     """A connection to one o2_org_dma instance.
 
-    Normally created via `o2org.connect(...)` rather than directly. Every
+    Normally created via `isofood_center.connect(...)` rather than directly. Every
     resource below is attached as an attribute once construction finishes (by
     `resources.attach_resources()`) — the declarations here exist only so your
     editor can autocomplete and hover them; the real values are set at runtime.
@@ -151,7 +151,7 @@ class OrgClient:
         """Fetch the declarative EAV field schema for a record_type via
         GET /api/record-types/{recordType}/schema.
 
-        This is what `o2org.pipelines.utils.extract.extract()` uses to
+        This is what `isofood_center.pipelines.utils.extract.extract()` uses to
         flatten `details` JSON without hardcoding a Python copy of the
         server's `ExperimentRecord::fieldSchema()`.
 

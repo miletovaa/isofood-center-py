@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "o2org"
+name = "isofood-center"
 version = "0.1.0"
-description = "Python client for o2_org_dma"
+description = "Python client and analysis pipelines for the ISOFood Center database (o2_org_dma)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
@@ -25,17 +25,9 @@ pipelines = [
     "plotly>=5.18",
     "kaleido>=0.2.1",
 ]
-ui = [
-    "o2org[pipelines]",
-    "streamlit>=1.32",
-    "openpyxl>=3.1",
-]
-
-[project.scripts]
-o2org-ui = "o2org.ui:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/o2org"]
+packages = ["src/isofood_center"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

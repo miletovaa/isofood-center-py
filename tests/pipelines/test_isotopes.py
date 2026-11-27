@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from o2org.client import OrgClient
-from o2org.pipelines import isotopes
+from isofood_center.client import OrgClient
+from isofood_center.pipelines import isotopes
 
 from ..helpers import FakeResponse
 

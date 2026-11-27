@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from o2org.client import OrgClient
-from o2org.exceptions import AuthenticationError, NotFoundError, ValidationError
+from isofood_center.client import OrgClient
+from isofood_center.exceptions import AuthenticationError, NotFoundError, ValidationError
 
 from .helpers import FakeResponse
 
